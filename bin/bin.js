@@ -13,7 +13,7 @@ import jsonbeautify from "json-beautify";
 
 const
     deloreanDir = fileURLToPath(new URL("../", import.meta.url)),
-    babelBin = fileURLToPath(new URL("../node_modules/@babel/cli/bin/babel.js", import.meta.url)),
+    babelBin = "babel",
     log = console.log;
 
 const header = `
@@ -189,7 +189,7 @@ const changeProjectConfig = (revert = false) => {
     const deloreanConfig = fs.readJsonSync(`${projectDir}/.deloreanrc.json`);
     let projectConfig =  fs.readJsonSync(projectConfigFile);
 
-    const backupFile = path.resolve(`${projectConfigFile}.delorean.json`);
+    const backupFile = path.resolve(`${projectConfigFile}.delorean`);
 
     // create backup
     if (revert !== true) {
@@ -294,13 +294,15 @@ const PREPARE = () => {
 
     const babelTarget = path.resolve(`${projectDir}/.deloreanbuild/`);
 
-    log(chalk.green("The Babel fish is small, yellow and leech-like..."));
+    log(chalk.green(`The Babel fish is small, yellow and leech-like...`));
+    log(chalk.yellow(`             ><_> `));
+
 
     log(chalk.blue(`Processing ${babelTarget}`));
-    log(chalk.blue(`node ${babelBin} ${babelTarget} -d ${babelTarget} --config-file ${babelConfig}`));
+    log(chalk.blue(`npx ${babelBin} ${babelTarget} -d ${babelTarget} --config-file ${babelConfig}`));
 
     //shell.exec(`node ${babelBin} ${babelTarget} -d ${babelTarget} --config-file ${babelConfig}`);
-    shell.exec(`node ${babelBin} ${babelTarget} -d ${babelTarget} --config-file ${babelConfig}`);
+    shell.exec(`npx ${babelBin} ${babelTarget} -d ${babelTarget} --config-file ${babelConfig}`);
 };
 
 
