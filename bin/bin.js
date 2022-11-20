@@ -78,7 +78,7 @@ try {
     if (options.help !== undefined) {
         showHelp = true;
     }
-    if (options.prepare !== undefined || options.cleanup !== undefined) {
+    if (options.prepare !== undefined || options.revert !== undefined) {
         IS_PREPARE = options.prepare !== undefined;
         IS_CLEANUP = !IS_PREPARE;
         showHelp = false;
