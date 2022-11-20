@@ -1,0 +1,57 @@
+{
+  "name": "@coon-js/delorean",
+  "version": "0.0.1",
+  "type": "module",
+  "scripts": {
+    "delorean": "delorean",
+    "release": "standard-version",
+    "release:patch": "standard-version --release-as patch && npm run postversion",
+    "release:minor": "standard-version --release-as minor && npm run postversion",
+    "release:major": "standard-version --release-as major && npm run postversion",
+    "postversion": "git push && git push --tags"
+  },
+  "bin": "bin/bin.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/coon-js/delorean.git"
+  },
+  "keywords": [
+    "sencha",
+    "coon.js",
+    "coon-js",
+    "l8.js",
+    "l8js",
+    "l8",
+    "javascript"
+  ],
+  "author": "Thorsten Suckow-Homberg <thorsten@suckow-homberg.de>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/coon-js/delorean/issues"
+  },
+  "homepage": "https://github.com/coon-js/delorean#readme",
+  "dependencies": {
+    "@babel/cli": "^7.19.3",
+    "@babel/core": "^7.20.2",
+    "@babel/preset-env": "^7.20.2",
+    "@l8js/l8": "^0.7.4",
+    "chalk": "^5.1.2",
+    "command-line-args": "^5.2.1",
+    "command-line-usage": "^6.1.3",
+    "fs-extra": "^10.1.0",
+    "path": "^0.12.7",
+    "shelljs": "^0.8.5",
+    "json-beautify": "^1.1.1",
+    "url": "^0.11.0"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^13.2.0",
+    "@commitlint/config-conventional": "^13.2.0",
+    "babel-cli": "^6.26.0",
+    "eslint": "^7.28.0",
+    "standard-version": "^9.3.1"
+  },
+  "engines": {
+    "node": ">=16.14"
+  }
+}
