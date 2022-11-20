@@ -1,6 +1,6 @@
 {
   "name": "@coon-js/delorean",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "type": "module",
   "scripts": {
     "postinstall": "node lib/postinstall.js",
