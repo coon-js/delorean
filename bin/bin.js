@@ -294,8 +294,8 @@ const PREPARE = () => {
 
     const babelTarget = path.resolve(`${projectDir}/.deloreanbuild/`);
 
-    log(chalk.green(`The Babel fish is small, yellow and leech-like...`));
-    log(chalk.yellow(`             ><_> `));
+    log(chalk.green("The Babel fish is small, yellow and leech-like..."));
+    log(chalk.yellow("             ><_> "));
 
 
     log(chalk.blue(`Processing ${babelTarget}`));

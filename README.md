@@ -2,7 +2,11 @@
 
 Utility script for transpiling Sencha Ext JS to ES 5 during the build process.
 
-## Usage
+```bash
+$ npx delorean 
+```
+
+## Installation
 
 Install **@coon-js/delorean** with 
 
@@ -10,6 +14,11 @@ Install **@coon-js/delorean** with
 $ npm i --save-dev @coon-js/delorean
 ```
 
+###
+
+
+
+### Automated transpiling
 Next, you need to adjust the `before-build` target for the Sencha CMD
 exec.
 
@@ -19,13 +28,13 @@ root of your Sencha Ext JS app or package:
 ```xml
 <target name="-before-build">
     <exec executable="cmd">
-        <arg line="/c npx delorean --prepare --src .src .app .classic"/>
+        <arg line="/c npx delorean --prepare"/>
     </exec>
 </target>
 
 <target name="-after-build">
     <exec executable="cmd">
-        <arg line="/c npx delorean --cleanup --src .src .app .classic"/>
+        <arg line="/c npx delorean --revert"/>
     </exec>
 </target>
 ```
