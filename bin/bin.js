@@ -14,10 +14,11 @@ import jsonbeautify from "json-beautify";
 const
     deloreanDir = fileURLToPath(new URL("../", import.meta.url)),
     babelBin = "babel",
+    deloreanPackage = fs.readJsonSync(`${deloreanDir}/package.json`),
     log = console.log;
 
 const header = `
-     |      |                            
+     |      |                  ${deloreanPackage.version}                         
   _\` |  _ \\ |  _ \\   __| _ \\  _\` | __ \\  
  (   |  __/ | (   | |    __/ (   | |   | 
 \\__,_|\\___|_|\\___/ _|  \\___|\\__,_|_|  _|
@@ -44,10 +45,7 @@ const sections = [
         optionList: [{
             name: "prepare",
             alias: "p",
-            description: `Moves the source files specified with {underline map} in the {underline .deloranrc.json} to
-                the {underline .deloreanbuild}-folder, and updates the package/app file with updated paths to source 
-                directories. {bold babel} will then transpile the sources found in {underline .deloreanbuild}. 
-                Run your {bold build} command afterwards.`,
+            description: "Moves the source files specified with {underline map} in the {underline .deloranrc.json} to the {underline .deloreanbuild}-folder, and updates the package/app file with updated paths to source directories. {bold babel} will then transpile the sources found in {underline .deloreanbuild}. Run your {bold build} command afterwards.",
             type: Boolean
         }, {
             name: "revert",
