@@ -1,8 +1,6 @@
----
-slug: /api/misc/@coon-js/delorean
----
+# delorean
 
-# 📦 delorean
+![](title.png)
 
 Tool for transpiling modern ECMAScript to ES5 in Sencha Ext JS CI/CD pipelines  .
 
@@ -17,8 +15,18 @@ $ npm i --save-dev @coon-js/delorean
 ```
 
 ## How it works
-There is a [detailed blog post](https://medium.com/@thorstensuckow/sencha-ext-js-beyond-es5-a0382916b7a6.) available 
+**@coon-js/delorean** is an npm tool that provides an additional transpiling layer on top of Sencha CMD with the help of 
+[**Babel**](httpy://babel.dev).
+
+![](delorean_pipeline.png)
+
+For making this work, **delorean** alters the project file of the package or application and redirects source-roots to the
+files that were processed and transpiled by Babel. This allows for using any JavaScript language feature in the project 
+code (even class syntax is now possible): With the default configuration of **delorean**, it will end up as ES5 code.
+
+There is a [detailed blog post](https://medium.com/@thorstensuckow/sencha-ext-js-beyond-es5-a0382916b7a6) available 
 that explains the motivation, the purpose and the internal functionality of this tool for further reference.
+
 
 
 ## Usage
