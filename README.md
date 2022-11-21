@@ -1,69 +1,27 @@
-# `@coon-js/delorean`
+---
+slug: /api/misc/@coon-js/delorean
+---
 
-![](title.png)
+# 📦 delorean
 
-Script for transpiling Sencha Ext JS to ES 5 .
+Tool for transpiling modern ECMAScript to ES5 in Sencha Ext JS CI/CD pipelines  .
 
-Allows for using modern ECMA script during development and convert to an ES version the Closure compiler
-of Sencha CMD understands.
+Allows for using modern ECMAScript and converting to  ES versions the Closure Compiler of Sencha CMD understands.
 
 ## Installation
 
-Install **@coon-js/delorean** with 
+Install **@coon-js/delorean** with
 
 ```bash
 $ npm i --save-dev @coon-js/delorean
 ```
 
-## How does it work
-Anyone who needs to work with **Sencha CMD** as part of a build process of an Ext JS project might have
-faced the problems that occur when modern JavaScript syntax is used, such as the
-[Nullish coalescing operator](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Nullish_coalescing)
+## How it works
+There is a [detailed blog post](https://medium.com/@thorstensuckow/sencha-ext-js-beyond-es5-a0382916b7a6.) available 
+that explains the motivation, the purpose and the internal functionality of this tool for further reference.
 
-```javascript
-const foo = null ?? 'default string';
-```
-
-the spread syntax with function arguments
-
-```javascript
-const fn = ([x, y, z]) => ({x, y, z});
-```
-or the [Optional chaining operator](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Optional_chaining):
-
-```javascript
-const adventurer = {
-  name: 'Alice',
-  cat: {
-    name: 'Dinah'
-  }
-};
-
-const dogName = adventurer.dog?.name;
-```
-
-Unfortunately, **Sencha CMD** uses an outdated Closure Compiler. Any of the above examples do not work 
-with Sencha CMD 7.4, and I was told that manually configuration by the developers maintaining Sencha CMD
-is required to allow for particular syntax support (source: [Sencha Discord Server](https://discord.gg/D7ypB45D)).
-
-To allow for modern JavaScript development with Ext JS, we can add a transpiling layer to which we redirect
-the development sources and feed the Closure Compiler with the Syntax it understands. 
-
-To do so, **delorean** alters the project file to make sure it points to the sources that were processed by **Babel**.
-**Sencha CMD** considers there project files during a standard build process and will use all the file
-resources resolved with the help of the project configuration files.
-
-To revert to the original project configuration file not pointing to the transpiled sources, a simple cli command
-can be used. This makes integrating **delorean** in existing **ci** environments easy. As a bonus, developers
-who have to forego the usage of `let` or similar because some outdated Browser does not support it can now
-happily hack away!
-
-However, we must consider the fact that **babel** adds some polyfills to the source code. I have not measured
-growth of the transpiled code, but I consider this fact as neclegtable now that I can use the Syntax I'm used
-to from more modern JavaScript frameworks.
 
 ## Usage
-
 
 ```bash
 $ npx delorean 
@@ -77,37 +35,64 @@ Run
 $ npx delorean -p
 ```
 
-This will add a `.babelrc` and a `.deloreanrc.json` into the root-directory of the package that is using
+This will add a `.babelrc` and a `.deloreanrc.json` to the root-directory of the package that is using
 **@coon-js/delorean**.
 
-Transpiled Source files will be available in the project's root `.deloreanbuild`-folder. Your
-`app.json` / `package.json` will be updated with source-roots (e.g. `classpath`, see [configuration](#configuration))
-pointing to `.deloreanbuild`.
-Sencha CMD will in any subsequent build-process consume the transpiled sources from this folder.
+Transpiled source files will be available in the `.deloreanbuild`-folder found in the project's root. Your
+`app.json` / `package.json` will contain updated information regarding source folders (e.g. `classpath`, see [configuration](#configuration)),
+which will now point to `.deloreanbuild:
+
+```diff
+  "classpath": [
+-            "${package.dir}/src",
+-            "${package.dir}/${toolkit.name}/src"
++            "${package.dir}/.deloreanbuild/src",
++            "${package.dir}/.deloreanbuild/${toolkit.name}/src"
+         ],
+         "overrides": [
+-            "${package.dir}/overrides",
+-            "${package.dir}/${toolkit.name}/overrides"
++            "${package.dir}/.deloreanbuild/overrides",
++            "${package.dir}/.deloreanbuild/${toolkit.name}/overrides"
+         ],
+```
+
+Subsequent **Sencha CMD** build processes will consume the transpiled sources found in this directory.
 
 ```bash
 $ npx delorean -r
 ```
 
-will revert the changes made to `app.json` / `package.json` by **@coon-js/delorean**.
+will revert the changes made to the `app.json` / `package.json`:
+
+```json
+  "classpath": [
+      "${package.dir}/src",
+      "${package.dir}/${toolkit.name}/src"
+  ],
+  "overrides": [
+      "${package.dir}/overrides",
+      "${package.dir}/${toolkit.name}/overrides"
+  ]
+```
 
 ## Command Line Options
 
 ### `--prepare, -p`
-Prepares the `.deloreanbuild` folder with transpiled sources and update the project file to point to
-this folder as the sources root (as [configured](#configuration)).
+Prepares the `.deloreanbuild` folder, adds transpiled sources to it and update the project file so that particular entries
+point to **this** folder as the sources root (see [configuration](#configuration)).
 
 ### `--revert, -r`
-Reverts the changes made to the project configuration files.
+Reverts the changes made to the configuration files.
 
 ### `--help, -h`
 Show the **help** screen.
 
-## Configuration 
+## Configuration
 #### `.deloreanrc.json`
 The configuration file required by **delorean**.
 Contains options for setting JSON-keys available with Sencha's Ext JS `package.json` / `app.json` that should be used
-for determining the JavaScript-source files that should get transpiled.
+for determining the JavaScript-source files for transpiling.
 
 ```json
 {
@@ -127,40 +112,43 @@ for determining the JavaScript-source files that should get transpiled.
 ```
 
 #### `map`
- - Type: `Array`
-Holds all the JSON-keys that should be considered when collecting source-directories that should get transpiled.
-Values containing template-strings will be properly considered, such as
+- Type: `Array`
 
- - `${package.dir}/src` 
- - `${toolkit.name}/src`
- - `app/${build.id}/overrides`
+Holds all the JSON-keys that should be considered when collecting source-directories for transpiling. Values containing
+template-strings will be properly considered, such as
+
+- `${package.dir}/src`
+- `${toolkit.name}/src`
+- `app/${build.id}/overrides`
 
 #### `toolkits`
 - Type: `Array`
-  Holds the values that should be used when evaluating values containing template-strings, such as `${toolkit.name}/src`.
+
+Holds the values that should be used when evaluating strings containing templates, such as `${toolkit.name}/src`.
 With `toolkits` set to `["modern", "classic"]`, the directories `modern/src` and `classic/src` will be considered
 when collecting source files for transpiling.
 
 #### `build`
 - Type: `Array`
-  Holds the values that should be used when evaluating values containing template-strings, such as `app/${build.id}/overrides`.
-  With `build` set to `["desktop", "shared"]`, the directories `app/desktop/overrides` and `app/shared/overrides` will be considered
-  when collecting source files for transpiling.
+
+Holds the values that should be used when evaluating strings containing templates, such as `app/${build.id}/overrides`.
+With `build` set to `["desktop", "shared"]`, the directories `app/desktop/overrides` and `app/shared/overrides` will be considered
+when collecting source files for transpiling.
 
 #### `.babelrc`
-The configuration file required by **babel**
-The `.babelrc` is the configuration file for **babel** and has default options known to
-work with Sencha Ext JS projects >= 7.6. Adjust to your needs. See [the documentation](https://babeljs.io/)
+The configuration file required by **Babel**
+The `.babelrc` is the configuration file for **Babel** and has default options known to
+work with Sencha Ext JS projects >= 7.4. Adjust to your needs. See [the documentation](https://babeljs.io/)
 for an exhaustive list of configuration options.
 
 
+## CI/CD Integration
+The two commands are easily integrated with CI/CD pipelines commonly used with Sencha Ext JS projects.
+You can automate transpiling by configuring either the `build.xml` of a Sencha package or a Sencha app, or by adding additional scripts to the `package.json`.
 
-## Automated transpiling
-You can automate transpiling by configuring either the `build.xml` of your package or app, or by adding
-scripts to your **npm** `package.json`.
+### build.xml
+This file is available with any package or app that is created with Sencha Ext JS. It provides a place for adding options and hooks for the Ant tool used with Sencha CMD and allows for configuring -before-build /-after-build targets (amongst others). You can make use of delorean by configuring the targets like so:
 
-### `build.xml`
-Adjust the `-before-build` and `-after-build` targets in your `build.xml`, like so:
 ```xml
 <target name="-before-build">
     <exec executable="cmd">
@@ -174,20 +162,16 @@ Adjust the `-before-build` and `-after-build` targets in your `build.xml`, like 
     </exec>
 </target>
 ```
+This will run `npx delorean -p` before Sencha CMD builds the project, and revert all project specific changes once the build completes by invoking `npx delorean -r`.
 
-This will run `npx delorean -p` before **Sencha CMD** builds the project, and `npx delorean -r` when
-building was finished.
-
-### `package.json`
-If you already have a build script that calls **Sencha CMD**, wrap the **build** command with **delorean**:Adjust the Next, you need to adjust the `-before-build` and `-after-build` targets, e.g.:
-
+### package.json
+If you already have a build script in your package.json that calls Sencha CMD, wrap the build command with calls to **delorean**. Here’s an example:
 
 ```json
 {
   "scripts": [
     "build": "npx delorean -p && npm run senchabuild && npx delorean -r",
-    "senchabuild": "npm run clean && cross-env webpack --env.profile=desktop --env.environment=production --env.treeshake=yes --env.cmdopts=--uses" ]
+    "senchabuild": "npm run clean && cross-env webpack --env.profile=desktop --env.environment=production --env.treeshake=yes --env.cmdopts=--uses"
   ]
 }
 ```
-
