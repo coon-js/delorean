@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.2.1](https://github.com/coon-js/delorean/compare/v0.2.0...v0.2.1) (2022-11-30)
+
+
+### Bug Fixes
+
+* **build:** update package lock ([43b638f](https://github.com/coon-js/delorean/commit/43b638f63be0d9e77d3b8fbe61cbc0841e19fbee))
+
 ## [0.2.0](https://github.com/coon-js/delorean/compare/v0.1.4...v0.2.0) (2022-11-30)
 
 
