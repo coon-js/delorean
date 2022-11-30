@@ -141,10 +141,10 @@ for determining the JavaScript-source files for transpiling.
     "builds": [
       "desktop", "shared"
     ],
-  "externals": [
-    "./node_modules/@lib/externalpackage",
-    "./packages/local/math"
-  ]
+    "externals": [
+      "./node_modules/@lib/externalpackage",
+      "./packages/local/math"
+    ]
 }
 ```
 
