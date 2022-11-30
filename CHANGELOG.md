@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.2.0](https://github.com/coon-js/delorean/compare/v0.1.4...v0.2.0) (2022-11-30)
+
+
+### Features
+
+* add "externals" for processing external sources using delorean ([80f38fd](https://github.com/coon-js/delorean/commit/80f38fd9ba34119d066fc592a7a9afbd3a862bf0))
+
 ### [0.1.4](https://github.com/coon-js/delorean/compare/v0.1.3...v0.1.4) (2022-11-22)
 
 ### [0.1.3](https://github.com/coon-js/delorean/compare/v0.1.2...v0.1.3) (2022-11-22)
