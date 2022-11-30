@@ -35,6 +35,8 @@ import chalk from "chalk";
 import getUsage from "command-line-usage";
 import shell from "shelljs";
 import jsonbeautify from "json-beautify";
+import randomInteger from "random-int";
+
 
 
 const
@@ -71,12 +73,17 @@ const sections = [
         optionList: [{
             name: "prepare",
             alias: "p",
-            description: "Moves the source files specified with {underline map} in the {underline .deloranrc.json} to the {underline .deloreanbuild}-folder, and updates the package/app file with updated paths to source directories. {bold babel} will then transpile the sources found in {underline .deloreanbuild}. Run your {bold build} command afterwards.",
+            description: "moves the source files specified with {underline map} in the {underline .deloranrc.json} to the {underline .deloreanbuild}-folder, and updates the package/app file with updated paths to source directories. {bold babel} will then transpile the sources found in {underline .deloreanbuild}. Run your {bold build} command afterwards.",
             type: Boolean
         }, {
             name: "revert",
             alias: "r",
-            description: "Reverts the changes made by {bold prepare} to the package/app configuration file",
+            description: "reverts the changes made by {bold prepare} to the package/app configuration file",
+            type: Boolean
+        }, {
+            name: "config",
+            alias: "c",
+            description: "config file to use (defaults to ../.deloreanrc.json)",
             type: Boolean
         }, {
             name: "help",
@@ -87,12 +94,13 @@ const sections = [
     }
 ];
 
-let options, showHelp = true, IS_PREPARE = false, IS_CLEANUP = false;
+let options, CONFIG_FILE = "./.deloreanrc.json", showHelp = true, IS_PREPARE = false, IS_CLEANUP = false;
 
 
 const optionDefinitions = [
     { name: "prepare", alias: "p"},
     { name: "revert", alias: "r"},
+    { name: "config", alias: "c"},
     { name: "help", alias: "h"},
     { name: "base", alias: "b", type: String}
 ];
@@ -101,6 +109,9 @@ try {
     options = commandLineArgs(optionDefinitions);
     if (options.help !== undefined) {
         showHelp = true;
+    }
+    if (options.config) {
+        CONFIG_FILE = options.config;
     }
     if (options.prepare !== undefined || options.revert !== undefined) {
         IS_PREPARE = options.prepare !== undefined;
@@ -132,6 +143,26 @@ if (!fs.pathExistsSync(projectConfigLookup)) {
 
 const projectConfigFile = path.resolve(projectConfigLookup);
 
+const quote = () => {
+
+    const quotes = fs.readJsonSync(fileURLToPath( new URL("../lib/quotes.json", import.meta.url)));
+
+    return quotes[randomInteger(0, quotes.length-1)];
+
+}
+
+const readConfiguration = () => {
+
+    const p = path.resolve(`${projectDir}/${CONFIG_FILE}`);
+
+    if (!fs.pathExistsSync(p)) {
+        log(chalk.red(`(trying "${p}"...`));
+        log(chalk.red(`no configuration "${CONFIG_FILE}" found, exiting...`));
+        process.exit(1);
+    }
+
+    return fs.readJsonSync(p);
+}
 
 /**
  * Considers entries of the following form:
@@ -144,11 +175,11 @@ const projectConfigFile = path.resolve(projectConfigLookup);
  */
 const getSourcePaths = () => {
 
-    const deloreanConfig = fs.readJsonSync(`${projectDir}/.deloreanrc.json`);
+    const deloreanConfig = readConfiguration();
     const projectConfig =  fs.readJsonSync(projectConfigFile);
     const paths = deloreanConfig.map;
-    const toolkitNames = deloreanConfig.toolkits;
-    const buildIds = deloreanConfig.builds;
+    const toolkitNames = deloreanConfig.toolkits || [];
+    const buildIds = deloreanConfig.builds || [];
 
     let output = [];
 
@@ -163,7 +194,8 @@ const getSourcePaths = () => {
         const spreadTpl = (dir, tpl, replacements) => {
             let result = [];
             if (dir.indexOf(tpl) !== -1) {
-                replacements.forEach(rpl => {
+
+                 replacements.forEach(rpl => {
                     result.push(dir.replace(tpl, rpl));
                 });
             } else {
@@ -201,6 +233,45 @@ const getSourcePaths = () => {
 
 };
 
+/**
+ * Process "externals"
+ * @returns {*[]}
+ */
+const processExternals = (revert) => {
+
+    const deloreanConfig = readConfiguration();
+    const externals = deloreanConfig.externals || [];
+
+
+    externals.forEach(external => {
+
+        const cfgExternal = external;
+
+        external = path.resolve(`${projectDir}/${external}`);
+
+        if (!fs.pathExistsSync(`${external}/.deloreanrc.json`)) {
+            log(chalk.red(`${cfgExternal} has no .deloreanrc.json configured, skipping`));
+        } else {
+
+            let cmd;
+
+            if (revert === true) {
+                log(chalk.green(`${cfgExternal} has .deloreanrc.json, reverting...`));
+                log(chalk.yellow(quote()));
+                cmd = `npx --prefix ${cfgExternal} delorean -r`;
+            } else {
+                log(chalk.green(`${cfgExternal} has .deloreanrc.json, preparing...`));
+                log(chalk.yellow(quote()));
+                cmd = `npx --prefix ${cfgExternal} delorean -p`;
+            }
+
+
+            shell.exec(cmd);
+        }
+    })
+};
+
+
 
 /**
  * Updates project config (app.json/package.json) with .deloreanbuild folder information.
@@ -210,7 +281,7 @@ const getSourcePaths = () => {
  */
 const changeProjectConfig = (revert = false) => {
 
-    const deloreanConfig = fs.readJsonSync(`${projectDir}/.deloreanrc.json`);
+    const deloreanConfig = readConfiguration();
     let projectConfig =  fs.readJsonSync(projectConfigFile);
 
     const backupFile = path.resolve(`${projectConfigFile}.delorean`);
@@ -315,6 +386,8 @@ const PREPARE = () => {
     copyConfigurationTemplates();
     moveProjectFiles();
     changeProjectConfig();
+    processExternals();
+
 
     const babelTarget = path.resolve(`${projectDir}/.deloreanbuild/`);
 
@@ -332,6 +405,7 @@ const PREPARE = () => {
 
 const CLEANUP = () => {
     changeProjectConfig(true);
+    processExternals(true);
 
     log(chalk.green("If you stick a Babel fish in your ear you can instantly understand anything..."));
     log(chalk.yellow("            <_>< "));

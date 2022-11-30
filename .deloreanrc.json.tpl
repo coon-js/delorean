@@ -8,7 +8,8 @@
     "toolkits": [
       "modern", "classic"
     ],
-    "build": [
+    "builds": [
       "desktop", "shared"
-    ]
+    ],
+    "externals": []
 }
