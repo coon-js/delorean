@@ -49,6 +49,26 @@ const CWD = path.resolve("./");
 let TARGET_DIR = CWD;
 let SANITIZE_JSON = false;
 
+
+/**
+ * Reads in a file that is assumed to be in JSON-format and strips any comments from
+ * the text before parsing it as JSON. This is required for some cases where Sencha Ext JS
+ * adds comments to its pre-built app.json files.
+ *
+ * @param {String} fileName
+ * @returns {Object}
+ *
+ * @see coon-js/delorean#2
+ */
+const readJson = fileName => {
+    let contents = fs.readFileSync(fileName, "UTF-8");
+
+    SANITIZE_JSON && (contents = stripJsonComments(contents));
+
+    return JSON.parse(contents);
+};
+
+
 const header = `
      |      |                  ${deloreanPackage.version}                         
   _\` |  _ \\ |  _ \\   __| _ \\  _\` | __ \\  
@@ -179,7 +199,6 @@ if (!fs.pathExistsSync(senchaAppFile) && fs.pathExistsSync(senchaPackageFile)) {
         if (!l8.isObject(sencha)) {
             log(chalk.red(`no "sencha" section available in ${senchaPackageFile}, exiting.`));
         }
-
     } catch (e) {
         log(chalk.red(`cannot read from ${senchaPackageFile}, exiting.`));
         process.exit(1);
@@ -196,25 +215,6 @@ if (!fs.pathExistsSync(senchaAppFile) && fs.pathExistsSync(senchaPackageFile)) {
 }
 
 const projectConfigFile = path.resolve(projectConfigLookup);
-
-/**
- * Reads in a file that is assumed to be in JSON-format and strips any comments from
- * the text before parsing it as JSON. This is required for some cases where Sencha Ext JS
- * adds comments to its pre-built app.json files.
- *
- * @param {String} fileName
- * @returns {Object}
- *
- * @see coon-js/delorean#2
- */
-const readJson = fileName => {
-    let contents = fs.readFileSync(fileName, "UTF-8");
-
-    SANITIZE_JSON && (contents = stripJsonComments(contents));
-
-    return JSON.parse(contents);
-};
-
 
 const quote = () => {
     const quotes = readJson(fileURLToPath( new URL("../lib/quotes.json", import.meta.url)));
@@ -263,7 +263,7 @@ const getSourcePaths = () => {
             let result = [];
             if (dir.indexOf(tpl) !== -1) {
 
-                 replacements.forEach(rpl => {
+                replacements.forEach(rpl => {
                     result.push(dir.replace(tpl, rpl));
                 });
             } else {
