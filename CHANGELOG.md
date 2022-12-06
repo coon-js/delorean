@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.1](https://github.com/coon-js/delorean/compare/v0.3.0...v0.3.1) (2022-12-06)
+
+
+### Bug Fixes
+
+* "readJson()" accessed before it's initialized ([5e98063](https://github.com/coon-js/delorean/commit/5e980638b3ce34d15ab3da1a8e845901799e9c51))
+
 ## [0.3.0](https://github.com/coon-js/delorean/compare/v0.2.2...v0.3.0) (2022-12-06)
 
 
