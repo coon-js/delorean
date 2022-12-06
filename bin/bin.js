@@ -36,7 +36,7 @@ import getUsage from "command-line-usage";
 import shell from "shelljs";
 import jsonbeautify from "json-beautify";
 import randomInteger from "random-int";
-
+import stripJsonComments from "strip-json-comments";
 
 
 const
@@ -47,7 +47,7 @@ const
 
 const CWD = path.resolve("./");
 let TARGET_DIR = CWD;
-
+let SANITIZE_JSON = false;
 
 const header = `
      |      |                  ${deloreanPackage.version}                         
@@ -67,7 +67,7 @@ const sections = [
     {
         header: "Synopsis",
         content: [
-            "$ npx delorean {bold --prepare}",
+            "$ npx delorean {bold --prepare} {bold --dir} ./",
             "$ npx delorean {bold --revert}",
             "$ npx delorean {bold --help}"
         ]
@@ -75,6 +75,16 @@ const sections = [
     {
         header: "Options",
         optionList: [{
+            name: "config",
+            alias: "c",
+            description: "config file to use (defaults to ./.deloreanrc.json)",
+            type: String
+        }, {
+            name: "dir",
+            alias: "d",
+            description: "target directory relative to **THIS** directory where the Sencha Ext JS App/the Package is located (defaults to ./)",
+            type: String
+        }, {
             name: "prepare",
             alias: "p",
             description: "moves the source files specified with {underline map} in the {underline .deloranrc.json} to the {underline .deloreanbuild}-folder, and updates the package/app file with updated paths to source directories. {bold babel} will then transpile the sources found in {underline .deloreanbuild}. Run your {bold build} command afterwards.",
@@ -85,14 +95,9 @@ const sections = [
             description: "reverts the changes made by {bold prepare} to the package/app configuration file",
             type: Boolean
         }, {
-            name: "directory",
-            alias: "d",
-            description: "target directory relative to **THIS** directory where the Sencha Ext JS App/the Package is located (defaults to ./)",
-            type: String
-        }, {
-            name: "config",
-            alias: "c",
-            description: "config file to use (defaults to ./.deloreanrc.json)",
+            name: "sanitize",
+            alias: "s",
+            description: "Sanitizes JSON and allows for reading in files that contain comments. {underline Warning:} This will produce valid JSON for write-operations, so comments will get lost on the way",
             type: Boolean
         }, {
             name: "help",
@@ -108,7 +113,8 @@ let options, CONFIG_FILE = "./.deloreanrc.json", showHelp = true, IS_PREPARE = f
 
 const optionDefinitions = [
     { name: "prepare", alias: "p"},
-    { name: "directory", alias: "d"},
+    { name: "dir", alias: "d"},
+    { name: "sanitize", alias: "s"},
     { name: "revert", alias: "r"},
     { name: "config", alias: "c"},
     { name: "help", alias: "h"},
@@ -129,8 +135,12 @@ try {
         showHelp = false;
     }
 
-    if (options.directory !== undefined) {
-        TARGET_DIR = path.resolve(`${CWD}/${options.directory}`);
+    if (options.dir) {
+        TARGET_DIR = path.resolve(`${CWD}/${options.dir}`);
+    }
+
+    if (options.sanitize !== undefined) {
+        SANITIZE_JSON = true;
     }
 
 } catch (e) {
@@ -159,10 +169,13 @@ if (!fs.pathExistsSync(projectConfigLookup)) {
     process.exit(1);
 }
 
+/**
+ * Validate Files
+ */
 if (!fs.pathExistsSync(senchaAppFile) && fs.pathExistsSync(senchaPackageFile)) {
     log("Validating package.json...");
     try {
-        const sencha = fs.readJsonSync(senchaPackageFile).sencha;
+        const sencha = readJson(senchaPackageFile).sencha;
         if (!l8.isObject(sencha)) {
             log(chalk.red(`no "sencha" section available in ${senchaPackageFile}, exiting.`));
         }
@@ -171,28 +184,52 @@ if (!fs.pathExistsSync(senchaAppFile) && fs.pathExistsSync(senchaPackageFile)) {
         log(chalk.red(`cannot read from ${senchaPackageFile}, exiting.`));
         process.exit(1);
     }
+} else if (!SANITIZE_JSON && fs.pathExistsSync(senchaAppFile)) {
+    log("Validating app.json...");
+    try {
+        const sencha = fs.readJsonSync(senchaAppFile);
+    } catch (e) {
+        log(chalk.red(`cannot read from ${senchaAppFile}, is it valid JSON? Consider running delorean with the --sanitize or -s option.`));
+        process.exit(1);
+    }
+
 }
 
 const projectConfigFile = path.resolve(projectConfigLookup);
 
+/**
+ * Reads in a file that is assumed to be in JSON-format and strips any comments from
+ * the text before parsing it as JSON. This is required for some cases where Sencha Ext JS
+ * adds comments to its pre-built app.json files.
+ *
+ * @param {String} fileName
+ * @returns {Object}
+ *
+ * @see coon-js/delorean#2
+ */
+const readJson = fileName => {
+    let contents = fs.readFileSync(fileName, "UTF-8");
+
+    SANITIZE_JSON && (contents = stripJsonComments(contents));
+
+    return JSON.parse(contents);
+};
+
+
 const quote = () => {
-
-    const quotes = fs.readJsonSync(fileURLToPath( new URL("../lib/quotes.json", import.meta.url)));
-
+    const quotes = readJson(fileURLToPath( new URL("../lib/quotes.json", import.meta.url)));
     return quotes[randomInteger(0, quotes.length-1)];
 };
 
 const readConfiguration = () => {
-
     const p = path.resolve(`${projectDir}/${CONFIG_FILE}`);
-
     if (!fs.pathExistsSync(p)) {
         log(chalk.red(`(trying "${p}"...`));
         log(chalk.red(`no configuration "${CONFIG_FILE}" found, exiting...`));
         process.exit(1);
     }
 
-    return fs.readJsonSync(p);
+    return readJson(p);
 }
 
 /**
@@ -207,7 +244,7 @@ const readConfiguration = () => {
 const getSourcePaths = () => {
 
     const deloreanConfig = readConfiguration();
-    const projectConfig =  fs.readJsonSync(projectConfigFile);
+    const projectConfig =  readJson(projectConfigFile);
     const paths = deloreanConfig.map;
     const toolkitNames = deloreanConfig.toolkits || [];
     const buildIds = deloreanConfig.builds || [];
@@ -313,7 +350,7 @@ const processExternals = (revert) => {
 const changeProjectConfig = (revert = false) => {
 
     const deloreanConfig = readConfiguration();
-    let projectConfig =  fs.readJsonSync(projectConfigFile);
+    let projectConfig =  readJson(projectConfigFile);
 
     const backupFile = path.resolve(`${projectConfigFile}.delorean`);
 

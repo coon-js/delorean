@@ -108,26 +108,29 @@ will revert the changes made to the `app.json` / `package.json`:
 
 ## Command Line Options
 
+### `--config, -c`
+Path to the config file to use, defaults to `./.deloreanrc.json`
+
+### `--dir, -d`
+Target directory relative to the directory where **delorean** was invoked, and  where the Sencha Ext JS App/the
+Package is located. Defaults to `./`
+
 ### `--prepare, -p`
 Prepares the `.deloreanbuild` folder, adds transpiled sources to it and update the project file so that particular entries
 point to **this** folder as the sources root (see [configuration](#configuration)).
 
-### `--directory, -d`
-Target directory relative to the directory where **delorean** was invoked, and  where the Sencha Ext JS App/the 
-Package is located. Defaults to `./`
-
-
-### `--config, -c`
-Path to the config file to use, defaults to `./.deloreanrc.json`
-
 ### `--revert, -r`
 Reverts the changes made to the configuration files.
+
+### `--sanitize, -s`
+Sanitizes JSON and allows for reading in files that contain comments. **Warning:** This will produce valid JSON for write-operations, 
+so existing comments will get lost on the way.
 
 ### `--help, -h`
 Show the **help** screen.
 
 ## Configuration
-### `.deloreanrc.json`
+#### `.deloreanrc.json`
 The configuration file required by **delorean**.
 Contains options for setting JSON-keys available with Sencha's Ext JS `package.json` / `app.json` that should be used
 for determining the JavaScript-source files for transpiling.
@@ -146,10 +149,10 @@ for determining the JavaScript-source files for transpiling.
     "builds": [
       "desktop", "shared"
     ],
-    "externals": [
-      "./node_modules/@lib/externalpackage",
-      "./packages/local/math"
-    ]
+  "externals": [
+    "./node_modules/@lib/externalpackage",
+    "./packages/local/math"
+  ]
 }
 ```
 
@@ -180,8 +183,8 @@ when collecting source files for transpiling.
 #### `externals`
 - Type: `Array`
 
-Paths to external packages that should be processed with this run of **delorean**. This is useful if you have a project
-consisting of additional external Ext JS packages that require transpilation before they get merged into a build. Please
+Paths to external packages that should be processed with this run of **delorean**. This is useful if you have a project 
+consisting of additional external Ext JS packages that require transpilation before they are merged in a build. Please
 note, that the external packages need to have **delorean** installed and configured.
 
 ### `.babelrc`

@@ -45,6 +45,7 @@
     "prompts": "^2.4.2",
     "random-int": "^3.0.0",
     "shelljs": "^0.8.5",
+    "strip-json-comments": "^5.0.0",
     "url": "^0.11.0"
   },
   "devDependencies": {
