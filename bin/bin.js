@@ -45,6 +45,10 @@ const
     deloreanPackage = fs.readJsonSync(`${deloreanDir}/package.json`),
     log = console.log;
 
+const CWD = path.resolve("./");
+let TARGET_DIR = CWD;
+
+
 const header = `
      |      |                  ${deloreanPackage.version}                         
   _\` |  _ \\ |  _ \\   __| _ \\  _\` | __ \\  
@@ -81,6 +85,11 @@ const sections = [
             description: "reverts the changes made by {bold prepare} to the package/app configuration file",
             type: Boolean
         }, {
+            name: "directory",
+            alias: "d",
+            description: "target directory relative to **THIS** directory where the Sencha Ext JS App/the Package is located (defaults to ./)",
+            type: String
+        }, {
             name: "config",
             alias: "c",
             description: "config file to use (defaults to ./.deloreanrc.json)",
@@ -99,6 +108,7 @@ let options, CONFIG_FILE = "./.deloreanrc.json", showHelp = true, IS_PREPARE = f
 
 const optionDefinitions = [
     { name: "prepare", alias: "p"},
+    { name: "directory", alias: "d"},
     { name: "revert", alias: "r"},
     { name: "config", alias: "c"},
     { name: "help", alias: "h"},
@@ -118,27 +128,49 @@ try {
         IS_CLEANUP = !IS_PREPARE;
         showHelp = false;
     }
+
+    if (options.directory !== undefined) {
+        TARGET_DIR = path.resolve(`${CWD}/${options.directory}`);
+    }
+
 } catch (e) {
     // intentionally left empty
 }
-
 
 if (showHelp) {
     console.log(getUsage(sections));
     process.exit();
 }
 
+log(chalk.yellow(`Using ${TARGET_DIR} as the project directory for delorean...`));
 
 const
-    base = options.base ? new URL(`file://${options.base}`) : new URL("../../../../", import.meta.url),
-    projectDir = fileURLToPath(base),
+    projectDir = TARGET_DIR,
     babelConfig = `${projectDir}/.babelrc`,
-    pkg = fs.readJsonSync(`${projectDir}/package.json`),
-    projectConfigLookup = fs.pathExistsSync(`${projectDir}/app.json`) ? `${projectDir}/app.json` : `${projectDir}/package.json`;
+    senchaPackageFile = `${projectDir}/package.json`,
+    senchaAppFile = `${projectDir}/app.json`,
+    projectConfigLookup = fs.pathExistsSync(`${projectDir}/app.json`) ? senchaAppFile : senchaPackageFile;
 
+/**
+ * Check app/package.json first.
+ */
 if (!fs.pathExistsSync(projectConfigLookup)) {
-    log(chalk.red("Cannot find project config (app.json/package.json), exiting..."));
+    log(chalk.red(`Cannot find project config (Sencha Ext JS app.json or package.json) in  ${TARGET_DIR}, exiting...`));
     process.exit(1);
+}
+
+if (!fs.pathExistsSync(senchaAppFile) && fs.pathExistsSync(senchaPackageFile)) {
+    log("Validating package.json...");
+    try {
+        const sencha = fs.readJsonSync(senchaPackageFile).sencha;
+        if (!l8.isObject(sencha)) {
+            log(chalk.red(`no "sencha" section available in ${senchaPackageFile}, exiting.`));
+        }
+
+    } catch (e) {
+        log(chalk.red(`cannot read from ${senchaPackageFile}, exiting.`));
+        process.exit(1);
+    }
 }
 
 const projectConfigFile = path.resolve(projectConfigLookup);
@@ -148,8 +180,7 @@ const quote = () => {
     const quotes = fs.readJsonSync(fileURLToPath( new URL("../lib/quotes.json", import.meta.url)));
 
     return quotes[randomInteger(0, quotes.length-1)];
-
-}
+};
 
 const readConfiguration = () => {
 

@@ -112,6 +112,11 @@ will revert the changes made to the `app.json` / `package.json`:
 Prepares the `.deloreanbuild` folder, adds transpiled sources to it and update the project file so that particular entries
 point to **this** folder as the sources root (see [configuration](#configuration)).
 
+### `--directory, -d`
+Target directory relative to the directory where **delorean** was invoked, and  where the Sencha Ext JS App/the 
+Package is located. Defaults to `./`
+
+
 ### `--config, -c`
 Path to the config file to use, defaults to `./.deloreanrc.json`
 
