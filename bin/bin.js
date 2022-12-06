@@ -83,7 +83,7 @@ const sections = [
         }, {
             name: "config",
             alias: "c",
-            description: "config file to use (defaults to ../.deloreanrc.json)",
+            description: "config file to use (defaults to ./.deloreanrc.json)",
             type: Boolean
         }, {
             name: "help",
