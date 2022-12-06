@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.3.0](https://github.com/coon-js/delorean/compare/v0.2.2...v0.3.0) (2022-12-06)
+
+
+### Features
+
+* add option to specify the target directory delorean should use ([6aee426](https://github.com/coon-js/delorean/commit/6aee426c5c2ed584f0fa2901d4fc8ec0a0665bba)), closes [coon-js/delorean#1](https://github.com/coon-js/delorean/issues/1)
+* allow for sanitizing JSON files ([0146d52](https://github.com/coon-js/delorean/commit/0146d52e35ef3f912b67ee6346a2ff271ba778fc)), closes [coon-js/delorean#2](https://github.com/coon-js/delorean/issues/2)
+
+
+### Bug Fixes
+
+* **docs:** synopsis lists wrong default path to .deloreanrc.json ([2ebbe99](https://github.com/coon-js/delorean/commit/2ebbe99e6004c96b25bc5deabf625371aa6a80c9))
+
 ### [0.2.2](https://github.com/coon-js/delorean/compare/v0.2.1...v0.2.2) (2022-11-30)
 
 ### [0.2.1](https://github.com/coon-js/delorean/compare/v0.2.0...v0.2.1) (2022-11-30)
