@@ -372,7 +372,7 @@ const changeProjectConfig = (revert = false) => {
 
         value = value.map(dir => {
 
-            dir = dir.replace(".deloreanbuild", "");
+            dir = dir.replace(".deloreanbuild/", "");
 
             if (revert !== true) {
                 if (dir.indexOf("${package.dir}") !== -1) {
