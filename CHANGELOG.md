@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.2](https://github.com/coon-js/delorean/compare/v0.3.1...v0.3.2) (2022-12-15)
+
+
+### Bug Fixes
+
+* using externals results in endless loop ([0d8747d](https://github.com/coon-js/delorean/commit/0d8747def921045172d0f49bd7c8c1fae0d7ccc8))
+
 ### [0.3.1](https://github.com/coon-js/delorean/compare/v0.3.0...v0.3.1) (2022-12-06)
 
 
