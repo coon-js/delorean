@@ -130,7 +130,7 @@ so existing comments will get lost on the way.
 Show the **help** screen.
 
 ## Configuration
-#### `.deloreanrc.json`
+### `.deloreanrc.json`
 The configuration file required by **delorean**.
 Contains options for setting JSON-keys available with Sencha's Ext JS `package.json` / `app.json` that should be used
 for determining the JavaScript-source files for transpiling.
@@ -149,10 +149,10 @@ for determining the JavaScript-source files for transpiling.
     "builds": [
       "desktop", "shared"
     ],
-  "externals": [
-    "./node_modules/@lib/externalpackage",
-    "./packages/local/math"
-  ]
+    "externals": [
+      "./node_modules/@lib/externalpackage",
+      "./packages/local/math"
+    ]
 }
 ```
 

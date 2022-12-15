@@ -326,11 +326,11 @@ const processExternals = (revert) => {
             if (revert === true) {
                 log(chalk.green(`${cfgExternal} has .deloreanrc.json, reverting...`));
                 log(chalk.yellow(quote()));
-                cmd = `npx --prefix ${cfgExternal} delorean -r`;
+                cmd = `npx --prefix ${cfgExternal} delorean -r -d ${cfgExternal}`;
             } else {
                 log(chalk.green(`${cfgExternal} has .deloreanrc.json, preparing...`));
                 log(chalk.yellow(quote()));
-                cmd = `npx --prefix ${cfgExternal} delorean -p`;
+                cmd = `npx --prefix ${cfgExternal} delorean -p -d ${cfgExternal}`;
             }
 
 
