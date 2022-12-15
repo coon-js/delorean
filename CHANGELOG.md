@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.3](https://github.com/coon-js/delorean/compare/v0.3.2...v0.3.3) (2022-12-15)
+
+
+### Bug Fixes
+
+* leading slash not removed with -r option ([7e8911e](https://github.com/coon-js/delorean/commit/7e8911e47d2f2d0d5017efc42234a7433e7ed3f5))
+
 ### [0.3.2](https://github.com/coon-js/delorean/compare/v0.3.1...v0.3.2) (2022-12-15)
 
 
