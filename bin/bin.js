@@ -487,4 +487,4 @@ if (IS_PREPARE) {
 }
 
 
-process.exit();
+process.exit(0);
