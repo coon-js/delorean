@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.4](https://github.com/coon-js/delorean/compare/v0.3.3...v0.3.4) (2024-01-11)
+
+
+### Bug Fixes
+
+* sequential scripts not running due to exit code ([d9c430a](https://github.com/coon-js/delorean/commit/d9c430a1f7c980cf82fd71cf612cebed5219d241)), closes [delorean/#4](https://github.com/delorean/delorean/issues/4)
+
 ### [0.3.3](https://github.com/coon-js/delorean/compare/v0.3.2...v0.3.3) (2022-12-15)
 
 
