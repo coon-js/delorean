@@ -466,7 +466,7 @@ const PREPARE = () => {
     log(chalk.blue(`Processing ${babelTarget}`));
     log(chalk.blue(`npx ${babelBin} "${babelTarget}" -d "${babelTarget}" --config-file "${babelConfig}"`));
 
-    //shell.exec(`node ${babelBin} ${babelTarget} -d ${babelTarget} --config-file ${babelConfig}`);
+    //shell.exec(`node ${babelBin} "${babelTarget}" -d "${babelTarget}" --config-file "${babelConfig}"`);
     shell.exec(`npx ${babelBin} "${babelTarget}" -d "${babelTarget}" --config-file "${babelConfig}"`);
 };
 
